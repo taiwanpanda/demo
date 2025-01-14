@@ -1,479 +1,283 @@
-﻿<!doctype html>
-
-
+<!doctype html>
 <html lang="en" class="no-js">
   <head>
     <meta charset="utf-8">
-
-
-<!-- begin _includes/seo.html --><title>Luau Demo</title>
-
-
-<!-- end _includes/seo.html -->
-
-
-
-
-<!-- https://t.co/dKP3o1e -->
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-
-<script>
-  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
-</script>
-
-
-<!-- For all browsers -->
-<link rel="stylesheet" href="/assets/css/main.css">
-<link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-<noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css"></noscript>
-
-
-
-
-
-
-    <!-- start custom head snippets -->
-
-
-<!-- insert favicons. use https://realfavicongenerator.net/ -->
-
-
-<!-- end custom head snippets -->
-
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Luau Demo</title>
+    <script>
+      document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+    </script>
+    <link rel="stylesheet" href="/assets/css/main.css">
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css"></noscript>
   </head>
 
-
   <body class="layout--single wide">
-    <nav class="skip-links">
-</nav>
-
+    <nav class="skip-links"></nav>
 
     <!--[if lt IE 9]>
-<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
-<![endif]-->
+    <div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+    <![endif]-->
 
-
-
-
-
-
-<script>
-    let theme = localStorage.getItem('theme');
-    if (theme === "dark") {
+    <script>
+      let theme = localStorage.getItem('theme');
+      if (theme === "dark") {
         localStorage.setItem('theme', 'dark');
-        node1 = document.getElementById('theme_source');
-        node2 = document.getElementById('theme_source_2');
-        node1.setAttribute('rel', 'stylesheet alternate');
-        node2.setAttribute('rel', 'stylesheet');
-    } else {
+        document.getElementById('theme_source').setAttribute('rel', 'stylesheet alternate');
+        document.getElementById('theme_source_2').setAttribute('rel', 'stylesheet');
+      } else {
         localStorage.setItem('theme', 'light');
-    }
+      }
 
-
-    function toggleTheme() {
-        node1 = document.getElementById("theme_source");
-        node2 = document.getElementById("theme_source_2");
+      function toggleTheme() {
+        let node1 = document.getElementById("theme_source");
+        let node2 = document.getElementById("theme_source_2");
         if (node1.getAttribute("rel") == "stylesheet") {
-            node1.setAttribute("rel", "stylesheet alternate");
-            node2.setAttribute("rel", "stylesheet");
-            try { editor.setOption("theme", "dark") } catch { };
-            localStorage.setItem("theme", "dark");
+          node1.setAttribute("rel", "stylesheet alternate");
+          node2.setAttribute("rel", "stylesheet");
+          try { editor.setOption("theme", "dark") } catch { };
+          localStorage.setItem("theme", "dark");
         } else {
-            node2.setAttribute("rel", "stylesheet alternate");
-            node1.setAttribute("rel", "stylesheet");
-            try { editor.setOption("theme", "light") } catch { };
-            localStorage.setItem("theme", "light");
+          node2.setAttribute("rel", "stylesheet alternate");
+          node1.setAttribute("rel", "stylesheet");
+          try { editor.setOption("theme", "light") } catch { };
+          localStorage.setItem("theme", "light");
         }
-return false;
-    }
-</script>
-
+        return false;
+      }
+    </script>
 
     <div class="initial-content">
-      
-  <article class="page" itemscope itemtype="https://schema.org/CreativeWork">
-    <meta itemprop="headline" content="Luau Demo">
-    
-    
-    
+      <article class="page" itemscope itemtype="https://schema.org/CreativeWork">
+        <meta itemprop="headline" content="Luau Demo">
+        <div class="page__inner-wrap">
+          <header>
+            <h1 id="page-title" class="page__title" itemprop="headline">Luau Demo</h1>
+          </header>
+          <section class="page__content" itemprop="text">
+            <form>
+              <div>
+                <label class="header-center"><b>Input</b></label>
+                <br />
+                <textarea rows="10" cols="80" id="script"></textarea>
+                <div class="button-group">
+                  <button onclick="executeScript(); return false;">Run</button>
+                  <button onclick="shareScript(); return false;">Share</button>
+                  <input type="checkbox" checked="true" id="output-clear" />
+                  <label for="output-clear">Clear Output</label>
+                </div>
+              </div>
+              <div>
+                <label class="header-center"><b>Output</b></label>
+                <br />
+                <textarea readonly rows="10" cols="70" id="output"></textarea>
+              </div>
+            </form>
 
+            <style>
+              .header-center {
+                text-align: center;
+              }
+              .button-group > * {
+                display: inline-block;
+                margin-right: 10px;
+                margin-left: 5px;
+              }
+              .line-error {
+                background: #e65f55;
+              }
+            </style>
 
-    <div class="page__inner-wrap">
-      
-        <header>
-          <h1 id="page-title" class="page__title" itemprop="headline">Luau Demo
-</h1>
-          
+            <!-- CodeMirror -->
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.14/codemirror.min.css" />
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.14/codemirror.min.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.14/addon/edit/matchbrackets.min.js"></script>
+            <style>
+              .cm-s-dark.CodeMirror {background: rgb(37, 37, 37); color: rgb(204, 204, 204);}
+              .cm-s-dark div.CodeMirror-selected {background: rgb(11, 90, 175) !important;}
+              .cm-s-dark .CodeMirror-gutters {background: rgb(50, 50, 50); border-right: 0px;}
+              .cm-s-dark .CodeMirror-linenumber {color: rgb(204, 204, 204);}
+              .cm-s-dark .CodeMirror-cursor {border-left: 1px solid rgb(204, 204, 204) !important;}
+              .cm-s-dark span.cm-comment {color: rgb(102, 102, 102);}
+              .cm-s-dark span.cm-atom {color: rgb(255, 198, 0);}
+              .cm-s-dark span.cm-number {color: rgb(255, 198, 0);}
+              .cm-s-dark span.cm-keyword {color: rgb(248, 109, 124);}
+              .cm-s-dark span.cm-string {color: rgb(173, 241, 149);}
+              .cm-s-dark span.cm-variable {color: rgb(204, 204, 204);}
+              .cm-s-dark span.cm-builtin {color:rgb(132, 214, 247);}
+              .cm-s-dark span.cm-bracket {color: rgb(204, 204, 204);}
+              .cm-s-dark span.cm-tag {color: rgb(255, 0, 0);}
+              .cm-s-dark .CodeMirror-matchingbracket { text-decoration: underline; color: white !important;}
+              .cm-s-dark .CodeMirror-activeline-background { background: #202020; }
+              .cm-s-light.CodeMirror {background: white; color: black;}
+              .cm-s-light div.CodeMirror-selected {background: rgb(110, 161, 241) !important;}
+              .cm-s-light .CodeMirror-gutters {background: rgb(221, 221, 221); border-right: 0px;}
+              .cm-s-light .CodeMirror-linenumber {color: black;}
+              .cm-s-light .CodeMirror-cursor {border-left: 1px solid black !important;}
+              .cm-s-light span.cm-comment {color: rgb(0, 127, 9);}
+              .cm-s-light span.cm-atom {color: rgb(0, 127, 127);}
+              .cm-s-light span.cm-number {color: rgb(0, 127, 127);}
+              .cm-s-light span.cm-keyword {color: rgb(0, 0, 127);}
+              .cm-s-light span.cm-string {color: rgb(127, 0, 127);}
+              .cm-s-light span.cm-variable {color: black;}
+              .cm-s-light span.cm-builtin {color:rgb(127, 0, 0);}
+              .cm-s-light span.cm-bracket {color: rgb(127, 127, 0);}
+              .cm-s-light span.cm-tag {color: rgb(255, 0, 0);}
+              .cm-s-light .CodeMirror-matchingbracket { text-decoration: underline; color: black !important;}
+              .cm-s-light .CodeMirror-activeline-background { background: #202020; }
+            </style>
 
+            <script src="assets/js/luau_mode.js"></script>
+            <script>
+              function getValueFromQueryString(key) {
+                return new URLSearchParams(window.location.search).get(key);
+              }
+              async function compressString(str) {
+                if (!TextEncoder || !CompressionStream || !Response || !Blob) return btoa(str);
+                console.info('Using gzip compression');
+                console.info('Original string length:', str.length);
+                console.info('base64encoded string length:', btoa(str).length);
+                var encoder = new TextEncoder();
+                var uint8Array = encoder.encode(str);
+                var compressedStream = new Response(
+                  new Blob([uint8Array]).stream().pipeThrough(new CompressionStream('gzip'))
+                ).arrayBuffer();
+                var compressedArrayBuffer = await compressedStream;
+                var compressedUint8Array = new Uint8Array(compressedArrayBuffer);
+                var compressedString = btoa(String.fromCharCode(...compressedUint8Array));
+                console.info('compressed string length:', compressedString.length);
+                return compressedString;
+              }
 
+              async function decompressString(str) {
+                if (!TextDecoder || !DecompressionStream || !Response || !Blob) return atob(str);
+                console.info('Using gzip decompression');
+                var decoder = new TextDecoder();
+                var compressedUint8Array = new Uint8Array(
+                  atob(str).split('').map(c => c.charCodeAt(0))
+                );
+                var decompressedStream = new Response(
+                  new Blob([compressedUint8Array]).stream().pipeThrough(new DecompressionStream('gzip'))
+                ).arrayBuffer();
+                var decompressedArrayBuffer = await decompressedStream;
+                return decoder.decode(decompressedArrayBuffer);
+              }
 
+              async function decodeShareString(str) {
+                if (!str) return null;
+                try {
+                  return await decompressString(decodeURIComponent(str));
+                } catch(e) {
+                  console.error('Error parsing share string:', e);
+                  return null;
+                }
+              }
 
-        </header>
-      
+              async function encodeShareString(str) {
+                try {
+                  return encodeURIComponent(await compressString(str));
+                } catch (e) {
+                  console.error('Error parsing share string:', e);
+                }
+              }
 
+              function maybeClearOutput() {
+                var output_clear = document.getElementById("output-clear");
+                if (output_clear.checked) {
+                  var output_box = document.getElementById("output");
+                  output_box.value = '';
+                }
+              }
 
-      <section class="page__content" itemprop="text">
-        
-        <form>
-    <div>
-        <label class="header-center"><b>Input</b></label>
-        <br />
-        <textarea rows="10" cols="80" id="script"></textarea>
-        <div class="button-group">
-            <button onclick="executeScript(); return false;">Run</button>
-            <button onclick="shareScript(); return false;">Share</button>
-            <input type="checkbox" checked="true" id="output-clear" />
-            <label for="output-clear">Clear Output</label>
+              var textValue = "print(\"Hello World!\")\n";
+              var editor = CodeMirror.fromTextArea(document.getElementById("script"), {
+                theme: localStorage.getItem('theme'),
+                mode: "luau",
+                matchBrackets: true,
+                lineNumbers: true,
+                smartIndent: true,
+                indentWithTabs: true,
+                indentUnit: 4
+              });
+              editor.setValue(textValue);
+              editor.addKeyMap({
+                "Ctrl-Enter": function (cm) {
+                  executeScript();
+                },
+                "Shift-Tab": function (cm) {
+                  cm.execCommand("indentLess");
+                }
+              });
+
+              var lastError = undefined;
+              function output(text) {
+                var output_box = document.getElementById("output");
+                output_box.value += text + "\n";
+                output_box.scrollTop = output_box.scrollHeight;
+              }
+
+              var Module = {
+                'print': function (msg) { output(msg) }
+              };
+
+              function executeScript() {
+                if (lastError) {
+                  editor.removeLineClass(lastError, "background", "line-error");
+                  lastError = undefined;
+                }
+                maybeClearOutput();
+                var err = Module.ccall('executeScript', 'string', ['string'], [editor.getValue()]);
+                if (err) {
+                  var err_text = err.replace('stdin:', '');
+                  output('Error:' + err_text);
+                  var err_line = parseInt(err_text);
+                  if (err_line) {
+                    lastError = editor.addLineClass(err_line - 1, "background", "line-error");
+                  }
+                }
+              }
+
+              async function shareScript() {
+                var sourceCode = editor.getValue();
+                var shareStr;
+                try {
+                  shareStr = await encodeShareString(editor.getValue());
+                } catch (e) {
+                  console.error('Error encoding share string', e);
+                }
+                if (!shareStr) {
+                  alert("There was an error encoding the share string. Your browser may not support the share feature.");
+                  return;
+                }
+                window.history.pushState({}, document.title, "?share=" + shareStr);
+                if (navigator.clipboard) {
+                  try {
+                    await navigator.clipboard.writeText(window.location);
+                    maybeClearOutput();
+                    output("Copied share link to clipboard.");
+                  } catch (e) {
+                    console.error(e);
+                    prompt("Share Link: ", window.location);
+                  }
+                } else {
+                  prompt("Share Link: ", window.location);
+                }
+              }
+
+              async function loadSharedString() {
+                var sharedCode = await decodeShareString(getValueFromQueryString("share"));
+                if (!sharedCode) return;
+                editor.setValue(sharedCode);
+              }
+              loadSharedString();
+            </script>
+            <script async src="https://github.com/luau-lang/luau/releases/latest/download/Luau.Web.js"></script>
+          </section>
+          <footer class="page__meta">
+          </footer>
         </div>
+      </article>
     </div>
-    <div>
-        <label class="header-center"><b>Output</b></label>
-        <br />
-        <textarea readonly="" rows="10" cols="70" id="output"></textarea>
-    </div>
-</form>
-
-
-<!-- Styles for editor -->
-<style>
-    .header-center {
-        text-align: center;
-    }
-
-
-    .button-group > * {
-        display: inline-block;
-        margin-right: 10px;
-        margin-left: 5px;
-    }
-
-
-    .line-error {
-        background: #e65f55;
-    }
-</style>
-
-
-<!-- CodeMirror -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.14/codemirror.min.js"></script>
-
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.14/addon/edit/matchbrackets.min.js"></script>
-
-
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.14/codemirror.min.css" />
-
-
-<style>
-    .cm-s-dark.CodeMirror {background: rgb(37, 37, 37); color: rgb(204, 204, 204);}
-    .cm-s-dark div.CodeMirror-selected {background: rgb(11, 90, 175) !important;}
-    .cm-s-dark .CodeMirror-gutters {background: rgb(50, 50, 50); border-right: 0px;}
-    .cm-s-dark .CodeMirror-linenumber {color: rgb(204, 204, 204);}
-    .cm-s-dark .CodeMirror-cursor {border-left: 1px solid rgb(204, 204, 204) !important;}
-
-
-    .cm-s-dark span.cm-comment {color: rgb(102, 102, 102);}
-    .cm-s-dark span.cm-atom {color: rgb(255, 198, 0);}
-    .cm-s-dark span.cm-number {color: rgb(255, 198, 0);}
-
-
-    .cm-s-dark span.cm-keyword {color: rgb(248, 109, 124);}
-    .cm-s-dark span.cm-string {color: rgb(173, 241, 149);}
-
-
-    .cm-s-dark span.cm-variable {color: rgb(204, 204, 204);}
-    .cm-s-dark span.cm-builtin {color:rgb(132, 214, 247);}
-    .cm-s-dark span.cm-bracket {color: rgb(204, 204, 204);}
-    .cm-s-dark span.cm-tag {color: rgb(255, 0, 0);}
-
-
-    .cm-s-dark .CodeMirror-matchingbracket { text-decoration: underline; color: white !important;}
-    .cm-s-dark .CodeMirror-activeline-background { background: #202020; }
-</style>
-
-
-<style>
-    .cm-s-light.CodeMirror {background: white; color: black;}
-    .cm-s-light div.CodeMirror-selected {background: rgb(110, 161, 241) !important;}
-    .cm-s-light .CodeMirror-gutters {background: rgb(221, 221, 221); border-right: 0px;}
-    .cm-s-light .CodeMirror-linenumber {color: black;}
-    .cm-s-light .CodeMirror-cursor {border-left: 1px solid black !important;}
-
-
-    .cm-s-light span.cm-comment {color: rgb(0, 127, 9);}
-    .cm-s-light span.cm-atom {color: rgb(0, 127, 127);}
-    .cm-s-light span.cm-number {color: rgb(0, 127, 127);}
-
-
-    .cm-s-light span.cm-keyword {color: rgb(0, 0, 127);}
-    .cm-s-light span.cm-string {color: rgb(127, 0, 127);}
-
-
-    .cm-s-light span.cm-variable {color: black;}
-    .cm-s-light span.cm-builtin {color:rgb(127, 0, 0);}
-    .cm-s-light span.cm-bracket {color: rgb(127, 127, 0);}
-    .cm-s-light span.cm-tag {color: rgb(255, 0, 0);}
-
-
-    .cm-s-light .CodeMirror-matchingbracket { text-decoration: underline; color: black !important;}
-    .cm-s-light .CodeMirror-activeline-background { background: #202020; }
-</style>
-
-
-<!-- Luau Parser for CodeMirror -->
-<script src="assets/js/luau_mode.js"></script>
-
-
-<!-- CodeMirror Luau Editor (MUST BE LOADED AFTER CODEMIRROR!) -->
-<script>
-    function getValueFromQueryString(key) {
-        return new URLSearchParams(window.location.search).get(key);
-    }
-    async function compressString(str) {
-        if (!TextEncoder || !CompressionStream || !Response || !Blob) return btoa(str);
-        console.info('Using gzip compression');
-        console.info('Original string length:', str.length);
-        console.info('base64encoded string length:', btoa(str).length);
-        var encoder = new TextEncoder();
-        var uint8Array = encoder.encode(str);
-
-
-        var compressedStream = new Response(
-            new Blob([uint8Array]).stream().pipeThrough(new CompressionStream('gzip'))
-        ).arrayBuffer();
-
-
-        var compressedArrayBuffer = await compressedStream;
-        var compressedUint8Array = new Uint8Array(compressedArrayBuffer);
-
-
-        var compressedString = btoa(String.fromCharCode(...compressedUint8Array));
-        console.info('compressed string length:', compressedString.length);
-        return compressedString
-    }
-
-
-    async function decompressString(str) {
-        if (!TextDecoder || !DecompressionStream || !Response || !Blob) return atob(str);
-        console.info('Using gzip decompression');
-        var decoder = new TextDecoder();
-        var compressedUint8Array = new Uint8Array(
-            atob(str).split('').map(c => c.charCodeAt(0))
-        );
-
-
-        var decompressedStream = new Response(
-            new Blob([compressedUint8Array]).stream().pipeThrough(new DecompressionStream('gzip'))
-        ).arrayBuffer();
-
-
-        var decompressedArrayBuffer = await decompressedStream;
-        return decoder.decode(decompressedArrayBuffer);
-    }
-
-
-    async function decodeShareString(str) {
-        if (!str) return null;
-        try {
-            return await decompressString(decodeURIComponent(str));
-        } catch(e) {
-            console.error('Error parsing share string:', e);
-            return null
-        }
-    }
-
-
-    async function encodeShareString(str) {
-        try {
-            return encodeURIComponent(await compressString(str));
-        } catch (e) {
-            console.error('Error parsing share string:', e);
-        }
-    }
-
-
-    function maybeClearOutput() {
-        var output_clear = document.getElementById("output-clear");
-        if (output_clear.checked) {
-            var output_box = document.getElementById("output");
-            output_box.value = '';
-        }
-    }
-
-
-    var textValue = "print(\"Hello World!\")\n";
-    var editor = CodeMirror.fromTextArea(document.getElementById("script"), {
-        theme: localStorage.getItem('theme'),
-        mode: "luau",
-        matchBrackets: true,
-        lineNumbers: true,
-        smartIndent: true,
-        indentWithTabs: true,
-        indentUnit: 4
-    });
-    editor.setValue(textValue);
-    editor.addKeyMap({
-        "Ctrl-Enter": function (cm) {
-            executeScript();
-        },
-        "Shift-Tab": function (cm) {
-            // dedent functionality
-            cm.execCommand("indentLess");
-        }
-    });
-
-
-    var lastError = undefined;
-
-
-    function output(text) {
-        var output_box = document.getElementById("output");
-        output_box.value += text + "\n";
-        // scroll to bottom
-        output_box.scrollTop = output_box.scrollHeight;
-    }
-
-
-    var Module = {
-        'print': function (msg) { output(msg) }
-    };
-
-
-    function executeScript() {
-        if (lastError) {
-            editor.removeLineClass(lastError, "background", "line-error");
-            lastError = undefined;
-        }
-
-
-        maybeClearOutput()
-
-
-        var err = Module.ccall('executeScript', 'string', ['string'], [editor.getValue()]);
-        if (err) {
-            var err_text = err.replace('stdin:', '');
-            output('Error:' + err_text);
-
-
-            var err_line = parseInt(err_text);
-            if (err_line) {
-                lastError = editor.addLineClass(err_line - 1, "background", "line-error");
-            }
-        }
-    }
-
-
-    async function shareScript() {
-        var sourceCode = editor.getValue();
-        var shareStr
-        try {
-            shareStr = await encodeShareString(editor.getValue());
-        } catch (e) {
-            console.error('Error encoding share string', e)
-        }
-        if (!shareStr) {
-            alert("There was an error encoding the share string. Your browser may not support the share feature.");
-            return;
-        }
-
-
-    
-
-
-        window.history.pushState({}, document.title, "?share=" + shareStr);
-
-
-        if (navigator.clipboard) {
-            try {
-                await navigator.clipboard.writeText(window.location);
-                maybeClearOutput()
-                output("Copied share link to clipboard.");
-            } catch (e) {
-                console.error(e)
-                prompt("Share Link: ", window.location);
-            }
-        } else {
-            prompt("Share Link: ", window.location);
-        }
-    }
-
-
-    async function loadSharedString() {
-        var sharedCode = await decodeShareString(getValueFromQueryString("share"));
-        if (!sharedCode) return;
-        editor.setValue(sharedCode);
-    }
-    loadSharedString();
-</script>
-
-
-<!-- Luau WASM (async fetch; should be the last line) -->
-<script async="" src="https://github.com/luau-lang/luau/releases/latest/download/Luau.Web.js"></script>
-
-
-
-
-        
-      </section>
-
-
-      <footer class="page__meta">
-        
-        
-
-
-
-
-        
-
-
-
-
-      </footer>
-
-
-      
-
-
-      
-    </div>
-
-
-    
-  </article>
-
-
-  
-  
-</div>
-
-
-    </div>
-
-
-    
-  <script src="/assets/js/main.min.js"></script>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    <script src="/assets/js/main.min.js"></script>
   </body>
 </html>
